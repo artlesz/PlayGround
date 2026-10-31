@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#060913" />
+    <meta
+      name="description"
+      content="Prisma 3D — estúdio completo de animação 3D no navegador. Crie cenas, anime com keyframes, aplique materiais e exporte vídeo ou GLB."
+    />
+    <title>Prisma 3D — Estúdio de animação</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%2367e8f9'/%3E%3Cstop offset='1' stop-color='%23a78bfa'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%23070b14'/%3E%3Cpath d='M32 12 51 44H13z' fill='none' stroke='url(%23g)' stroke-width='5' stroke-linejoin='round'/%3E%3C/svg%3E"
+    />
+    <script type="module" crossorigin src="/assets/index-CbRwF2oQ.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-DYsJ8pD-.css">
+  </head>
+  <body>
+    <div id="app" class="app">
+      <header class="topbar">
+        <div class="brand" title="Prisma 3D">
+          <span class="brand-mark">
+            <svg viewBox="0 0 48 48" width="30" height="30" aria-hidden="true">
+              <defs>
+                <linearGradient id="brandGradient" x1="0" y1="0" x2="1" y2="1">
+                  <stop stop-color="#67e8f9" />
+                  <stop offset="1" stop-color="#a78bfa" />
+                </linearGradient>
+              </defs>
+              <path d="M24 4 44 38H4z" fill="none" stroke="url(#brandGradient)" stroke-width="3.4" stroke-linejoin="round" />
+              <path d="M24 15 35 34H13z" fill="url(#brandGradient)" opacity=".14" />
+              <circle cx="24" cy="30" r="3" fill="#67e8f9" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <span class="brand-name">PRISMA<span>3D</span></span>
+            <span class="brand-tag">estúdio de animação</span>
+          </span>
+        </div>
+
+        <div class="project-block">
+          <label class="sr-only" for="projectName">Nome do projeto</label>
+          <input id="projectName" class="project-name" value="Órbita Neon" spellcheck="false" autocomplete="off" />
+          <span id="saveState" class="save-state"><i></i>Salvo localmente</span>
+        </div>
+
+        <nav class="top-actions" aria-label="Ações do projeto">
+          <div class="btn-group">
+            <button id="undoBtn" class="btn icon-btn" title="Desfazer (Ctrl+Z)" aria-label="Desfazer"></button>
+            <button id="redoBtn" class="btn icon-btn" title="Refazer (Ctrl+Shift+Z)" aria-label="Refazer"></button>
+          </div>
+          <button id="newBtn" class="btn" title="Novo projeto">Novo</button>
+          <button id="openBtn" class="btn" title="Abrir projeto .json">Abrir</button>
+          <button id="saveBtn" class="btn" title="Baixar projeto .json">Salvar</button>
+          <div class="menu-anchor">
+            <button id="exportBtn" class="btn primary" title="Exportar cena">Exportar <span id="exportCaret"></span></button>
+            <div id="exportMenu" class="menu export-menu" hidden>
+              <button class="menu-item" data-export="glb">
+                <span class="menu-ico" data-ico="package"></span>
+                <span><strong>Modelo .glb</strong><small>Malha + animações + câmera</small></span>
+              </button>
+              <button class="menu-item" data-export="video">
+                <span class="menu-ico" data-ico="video"></span>
+                <span><strong>Vídeo .webm</strong><small>Grava um ciclo do viewport</small></span>
+              </button>
+              <button class="menu-item" data-export="png">
+                <span class="menu-ico" data-ico="image"></span>
+                <span><strong>Imagem .png</strong><small>Frame atual em alta resolução</small></span>
+              </button>
+              <button class="menu-item" data-export="json">
+                <span class="menu-ico" data-ico="save"></span>
+                <span><strong>Projeto .json</strong><small>Cena editável completa</small></span>
+              </button>
+            </div>
+          </div>
+          <button id="helpBtn" class="btn icon-btn help-btn" title="Ajuda e atalhos" aria-label="Ajuda"></button>
+          <button id="mobileSceneBtn" class="btn icon-btn mobile-only" title="Cena" aria-label="Abrir painel da cena"></button>
+          <button id="mobilePropsBtn" class="btn icon-btn mobile-only" title="Propriedades" aria-label="Abrir painel de propriedades"></button>
+        </nav>
+      </header>
+
+      <main class="workspace">
+        <aside id="scenePanel" class="panel panel-left" aria-label="Painel da cena">
+          <div class="panel-head">
+            <div>
+              <h2>Cena</h2>
+              <p><span id="objectCount">0</span> objetos</p>
+            </div>
+            <button id="panelSceneClose" class="btn icon-btn mobile-only" aria-label="Fechar painel"></button>
+          </div>
+          <div class="panel-scroll">
+            <div class="search-wrap">
+              <span data-ico="focus" class="search-ico"></span>
+              <input id="objectSearch" type="search" placeholder="Buscar objeto…" autocomplete="off" />
+            </div>
+            <div id="sceneTree" class="scene-tree" role="tree" aria-label="Objetos da cena"></div>
+
+            <div class="add-area">
+              <button id="addBtn" class="add-main">
+                <span data-ico="plus"></span>
+                <span>Adicionar objeto</span>
+                <span class="add-caret" data-ico="chevronDown"></span>
+              </button>
+              <div id="addMenu" class="add-menu" hidden>
+                <div class="add-section-label">Formas</div>
+                <div class="add-grid" id="shapeGrid"></div>
+                <div class="add-section-label">Cena</div>
+                <div class="add-grid add-grid-wide">
+                  <button class="add-chip" data-add="group"><span data-ico="group"></span>Grupo</button>
+                  <button class="add-chip" data-add="camera"><span data-ico="camera"></span>Câmera</button>
+                  <button class="add-chip" data-add="light-point"><span data-ico="light"></span>Luz pontual</button>
+                  <button class="add-chip" data-add="light-directional"><span data-ico="sun"></span>Luz direcional</button>
+                  <button class="add-chip" data-add="light-spot"><span data-ico="spot"></span>Spot</button>
+                </div>
+              </div>
+            </div>
+
+            <button id="importBtn" class="import-btn">
+              <span class="import-ico" data-ico="upload"></span>
+              <span><strong>Importar modelo 3D</strong><small>GLB ou glTF com texturas</small></span>
+            </button>
+
+            <div class="mobile-file-actions">
+              <button class="btn" data-mobile-action="new">Novo</button>
+              <button class="btn" data-mobile-action="open">Abrir</button>
+              <button class="btn" data-mobile-action="save">Salvar</button>
+            </div>
+
+            <section class="panel-section">
+              <div class="section-heading">
+                <span>Animações prontas</span>
+                <span class="section-hint">aplicar no selecionado</span>
+              </div>
+              <div id="presetGrid" class="preset-grid"></div>
+            </section>
+
+            <div class="tip-card">
+              <span data-ico="sparkles"></span>
+              <p><strong>Dica</strong> Arraste para orbitar, use <kbd>W</kbd> <kbd>E</kbd> <kbd>R</kbd> para mover, girar e escalar. Pressione <kbd>K</kbd> para criar um keyframe.</p>
+            </div>
+          </div>
+        </aside>
+
+        <section class="viewport-wrap" aria-label="Viewport 3D">
+          <div id="viewport" class="viewport">
+            <div class="viewport-vignette"></div>
+
+            <div class="viewport-toolbar tools-left">
+              <div class="tool-group" role="group" aria-label="Ferramenta de transformação">
+                <button id="modeTranslate" class="tool-btn active" data-mode="translate" title="Mover (W)" aria-label="Mover">
+                  <span data-ico="move"></span>
+                </button>
+                <button id="modeRotate" class="tool-btn" data-mode="rotate" title="Girar (E)" aria-label="Girar">
+                  <span data-ico="rotate"></span>
+                </button>
+                <button id="modeScale" class="tool-btn" data-mode="scale" title="Escalar (R)" aria-label="Escalar">
+                  <span data-ico="scale"></span>
+                </button>
+              </div>
+              <div class="tool-divider"></div>
+              <button id="spaceBtn" class="tool-btn wide" title="Alternar espaço local/mundo"><span data-ico="target"></span><span id="spaceLabel">Mundo</span></button>
+              <button id="gridBtn" class="tool-btn" title="Mostrar grade (G)" aria-label="Grade"><span data-ico="grid"></span></button>
+            </div>
+
+            <div class="viewport-toolbar tools-right">
+              <div class="tool-group compact">
+                <button class="tool-btn view-btn" data-view="persp" title="Perspectiva">Persp</button>
+                <button class="tool-btn view-btn" data-view="front" title="Frente">Frente</button>
+                <button class="tool-btn view-btn" data-view="top" title="Topo">Topo</button>
+                <button class="tool-btn view-btn" data-view="side" title="Lado">Lado</button>
+              </div>
+              <button id="focusBtn" class="tool-btn" title="Enquadrar seleção (F)" aria-label="Enquadrar seleção"><span data-ico="focus"></span></button>
+              <button id="liveCamBtn" class="tool-btn wide" title="Ver pela câmera da cena" aria-pressed="false"><span data-ico="camera"></span><span>Câmera</span></button>
+            </div>
+
+            <div class="viewport-footer">
+              <div class="viewport-hint">
+                <span class="hint-dot"></span>
+                <span id="hintText">Clique para selecionar · arraste para orbitar · scroll para zoom</span>
+              </div>
+              <div class="render-stats">
+                <span id="fpsStat">— fps</span>
+                <span class="stat-sep">·</span>
+                <span id="triStat">0 tris</span>
+                <span class="stat-sep">·</span>
+                <span class="badge-live">WebGL</span>
+              </div>
+            </div>
+
+            <div id="dropOverlay" class="drop-overlay" hidden>
+              <div class="drop-card">
+                <span data-ico="upload"></span>
+                <h3>Solte para importar</h3>
+                <p>Arquivos .glb ou .gltf</p>
+              </div>
+            </div>
+
+            <div id="recordHud" class="record-hud" hidden>
+              <span class="record-dot"></span>
+              <div>
+                <strong>Gravando viewport</strong>
+                <small id="recordTime">0,0s / 6,0s</small>
+              </div>
+              <button id="stopRecordBtn" class="btn tiny">Parar</button>
+            </div>
+
+            <div id="loadingOverlay" class="loading-overlay">
+              <div class="loader-mark">
+                <svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true">
+                  <path d="M24 4 44 38H4z" fill="none" stroke="url(#brandGradient)" stroke-width="3.4" stroke-linejoin="round" />
+                </svg>
+                <span class="loader-ring"></span>
+              </div>
+              <p>Montando o estúdio…</p>
+            </div>
+          </div>
+        </section>
+
+        <aside id="propsPanel" class="panel panel-right" aria-label="Painel de propriedades">
+          <div class="panel-head">
+            <div>
+              <h2>Propriedades</h2>
+              <p id="selectionBadge">Nada selecionado</p>
+            </div>
+            <button id="panelPropsClose" class="btn icon-btn mobile-only" aria-label="Fechar painel"></button>
+          </div>
+          <div id="inspector" class="panel-scroll inspector"></div>
+        </aside>
+
+        <div id="drawerBackdrop" class="drawer-backdrop" hidden></div>
+      </main>
+
+      <section class="timeline" aria-label="Linha do tempo de animação">
+        <div class="timeline-head">
+          <div class="transport">
+            <button id="jumpStartBtn" class="transport-btn" title="Início (Home)" aria-label="Ir para o início"><span data-ico="skipStart"></span></button>
+            <button id="prevFrameBtn" class="transport-btn" title="Frame anterior (←)" aria-label="Frame anterior"><span data-ico="prev"></span></button>
+            <button id="playBtn" class="play-btn" title="Reproduzir (Espaço)" aria-label="Reproduzir"><span data-ico="play"></span></button>
+            <button id="nextFrameBtn" class="transport-btn" title="Próximo frame (→)" aria-label="Próximo frame"><span data-ico="next"></span></button>
+            <button id="jumpEndBtn" class="transport-btn" title="Fim (End)" aria-label="Ir para o fim"><span data-ico="skipEnd"></span></button>
+            <div class="time-box">
+              <span id="timeReadout" class="time-readout">00:00:00</span>
+              <span class="time-total">/ <span id="durationReadout">6,0s</span></span>
+            </div>
+            <button id="loopBtn" class="chip-toggle active" aria-pressed="true" title="Repetir animação"><span data-ico="loop"></span><span class="chip-label">Repetir</span></button>
+            <button id="autokeyBtn" class="chip-toggle" aria-pressed="false" title="Criar keyframes automaticamente"><span data-ico="key"></span><span class="chip-label">Auto-key</span></button>
+            <label class="speed-field">Velocidade
+              <select id="speedSelect">
+                <option value="0.25">0,25×</option>
+                <option value="0.5">0,5×</option>
+                <option value="1" selected>1×</option>
+                <option value="1.5">1,5×</option>
+                <option value="2">2×</option>
+              </select>
+            </label>
+          </div>
+          <div class="timeline-actions">
+            <button id="addKeyBtn" class="btn small key-btn" title="Criar keyframe no tempo atual (K)"><span data-ico="key"></span>Keyframe</button>
+            <label class="ease-field">Suavização
+              <select id="easeSelect" disabled></select>
+            </label>
+            <button id="deleteKeyBtn" class="btn icon-btn small" disabled title="Excluir keyframe selecionado" aria-label="Excluir keyframe"><span data-ico="trash"></span></button>
+            <div class="timeline-zoom">
+              <button id="zoomOutBtn" class="btn icon-btn small" title="Diminuir zoom" aria-label="Diminuir zoom"><span data-ico="zoomOut"></span></button>
+              <span id="zoomLabel">100%</span>
+              <button id="zoomInBtn" class="btn icon-btn small" title="Aumentar zoom" aria-label="Aumentar zoom"><span data-ico="zoomIn"></span></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="timeline-settings">
+          <label>Duração <input id="durationInput" type="number" min="1" max="120" step="0.5" value="6" /> <small>s</small></label>
+          <label>FPS
+            <select id="fpsSelect">
+              <option value="24">24</option>
+              <option value="30" selected>30</option>
+              <option value="60">60</option>
+            </select>
+          </label>
+          <span class="settings-sep"></span>
+          <label class="check-field"><input id="gridToggle" type="checkbox" checked /> Grade</label>
+          <label class="check-field"><input id="shadowToggle" type="checkbox" checked /> Sombras</label>
+          <span class="timeline-tip" id="timelineTip">Selecione um objeto para animar</span>
+        </div>
+
+        <div class="timeline-main">
+          <div class="track-labels">
+            <div class="ruler-spacer">
+              <span data-ico="key"></span>
+              <span id="trackObjectName">Animação</span>
+            </div>
+            <div id="trackLabels" class="track-label-list"></div>
+          </div>
+          <div id="timelineScroll" class="timeline-scroll">
+            <div id="timelineInner" class="timeline-inner">
+              <div id="ruler" class="ruler"></div>
+              <div id="trackRows" class="track-rows"></div>
+              <div id="playhead" class="playhead"><span class="playhead-cap"></span></div>
+              <div id="trackEmpty" class="track-empty" hidden>
+                <span data-ico="key"></span>
+                <p>Selecione um objeto na cena e crie seu primeiro keyframe.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div id="toasts" class="toasts" aria-live="polite"></div>
+    <div id="modalRoot"></div>
+
+    <input id="projectFileInput" type="file" accept=".json,application/json" hidden />
+    <input id="modelFileInput" type="file" accept=".glb,.gltf,model/gltf-binary,model/gltf+json" hidden />
+
+  </body>
+</html>
